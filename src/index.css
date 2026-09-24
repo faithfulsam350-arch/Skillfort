@@ -649,212 +649,456 @@ a {
   padding-top: 56px;
 }
 
+.steps-section .section-title,
+.why-section .section-title {
+  margin-bottom: 46.8px;
+}
+
+/* ------------------------------------------------------------------
+   How it works
+   Figma lays this out on a 1079px-wide canvas: three cards sit over a
+   dashed path. Every icon lives in a solid white box that is stacked
+   above the path, so the dashes disappear behind the icons and only
+   show in the gaps between them.
+   ------------------------------------------------------------------ */
 .steps {
+  --icon: 150px;
   position: relative;
-  display: grid;
+  display: flex;
   width: 100%;
-  grid-template-columns: repeat(3, 1fr);
-  margin: 0 0 35px;
+  flex-direction: column;
+  align-items: center;
+  gap: 40px;
+  margin: 0 0 32px;
 }
 
 .step-path {
-  position: absolute;
-  z-index: 0;
-  top: 61px;
-  left: 50%;
-  transform: translateX(-50%);
+  display: none;
 }
 
 .step {
   position: relative;
   z-index: 1;
-  padding: 0 40px;
+  display: flex;
+  width: 100%;
+  max-width: 320px;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
 }
 
 .step-art {
-  display: flex;
-  height: 200px;
-  align-items: center;
-  justify-content: center;
+  position: relative;
+  width: min(var(--icon), 100%);
+  aspect-ratio: 1;
+  flex: none;
+  overflow: clip;
+  background: #fff;
 }
 
-.step:first-child .step-art img {
-  width: 165px;
-  height: 165px;
-  object-fit: contain;
+.step-art > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+}
+
+.art-inner,
+.art-bleed {
+  position: absolute;
+  display: block;
+}
+
+.art-bleed img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
 }
 
 .step h3 {
+  width: 100%;
   margin: 0 0 10px;
+  color: #0e0b0b;
   font-family: "Poppins:SemiBold", sans-serif;
-  font-weight: 600;
   font-size: 24px;
+  font-weight: 600;
+  line-height: 1.15;
 }
 
 .step p {
+  width: 100%;
   margin: 0;
   color: #2d2828;
   font-family: "Open Sans:SemiBold", sans-serif;
-  font-size: 19px;
-  line-height: 1.25;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.15;
 }
 
+@media (min-width: 821px) {
+  .steps {
+    --icon: 176px;
+    display: block;
+    width: min(1079px, 100%);
+    height: 367px;
+    margin: 0 0 24px;
+  }
+
+  .step-path {
+    position: absolute;
+    z-index: 0;
+    top: 38.5px;
+    left: 18.35%;
+    display: block;
+    width: 70.4%;
+    height: auto;
+    max-width: none;
+    pointer-events: none;
+  }
+
+  .step {
+    position: absolute;
+    top: 0;
+    width: 20.95%;
+    max-width: none;
+  }
+
+  .step:nth-of-type(1) {
+    left: 0;
+  }
+
+  .step:nth-of-type(2) {
+    left: 39.11%;
+  }
+
+  .step:nth-of-type(3) {
+    top: 6px;
+    left: 78.22%;
+  }
+
+  /* Icon boxes are 209px in the design; keep their centre, shrink the box */
+  .step-art {
+    margin-top: calc((209px - var(--icon)) / 2);
+  }
+
+  .step:nth-of-type(1) h3 {
+    margin-bottom: 8px;
+  }
+
+  /* The middle card's copy is 252px wide in the design (226px card) */
+  .step:nth-of-type(2) h3,
+  .step:nth-of-type(2) p {
+    width: 111.5%;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Why Skillfort
+   ------------------------------------------------------------------ */
 .why-section {
-  padding-top: 100px;
+  padding-top: 50px;
 }
 
 .why-layout {
   display: grid;
-  grid-template-columns: 490px 1fr;
+  grid-template-columns: auto minmax(0, 1fr);
   align-items: center;
-  gap: 45px;
+  gap: 24px;
 }
 
 .why-visual {
+  --s: var(--why-s, 1);
   position: relative;
-  height: 490px;
+  width: calc(521px * var(--s));
+  height: calc(521px * var(--s));
 }
 
-.why-ring {
+.why-stage {
   position: absolute;
-  top: 30px;
-  left: 30px;
+  top: 0;
+  left: 0;
+  width: 521px;
+  height: 521px;
+  transform: scale(var(--s));
+  transform-origin: 0 0;
 }
 
-.why-photo {
+.why-stage > * {
   position: absolute;
-  top: 62px;
-  left: 62px;
-  width: 370px;
-  height: 370px;
+  display: block;
+  max-width: none;
+}
+
+/* Both people inside the circle... */
+.why-circle {
+  top: 60.92px;
+  left: 69.61px;
+  width: 361.39px;
+  height: 361.39px;
+  overflow: hidden;
   border-radius: 50%;
-  object-fit: cover;
-  object-position: center;
+}
+
+.why-circle img {
+  position: absolute;
+  top: 41.38px;
+  left: -69.61px;
+  width: 477.7px;
+  height: 318.75px;
+  max-width: none;
+}
+
+/* ...and the same photo cropped at the waist so heads rise above it */
+.why-person {
+  top: 48px;
+  left: 100px;
+  width: 351.8px;
+  height: 294px;
+  overflow: hidden;
+}
+
+.why-person img {
+  position: absolute;
+  top: 52.27px;
+  left: -98.86px;
+  width: 475.4px;
+  height: 318px;
+  max-width: none;
+}
+
+.why-ring,
+.why-arc {
+  top: 45.83px;
+  left: 45.83px;
+  width: 429.325px;
+  height: 429.325px;
+}
+
+.why-arc-flip {
+  transform: rotate(165.9deg);
+}
+
+.why-arc img {
+  position: absolute;
+  top: 0.5%;
+  left: 56.93%;
+  width: 43.07%;
+  height: 49.5%;
+  max-width: none;
 }
 
 .why-play {
-  position: absolute;
-  z-index: 2;
-  top: 66px;
-  right: 35px;
+  top: 70.63px;
+  left: 370.04px;
+  width: 50.373px;
+  height: 50.373px;
+}
+
+.why-content {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  gap: 48px;
 }
 
 .why-description {
-  margin: 0 0 42px;
+  margin: 0;
   color: #2d2828;
   font-family: "Open Sans:SemiBold", sans-serif;
   font-size: 22px;
-  line-height: 1.45;
+  font-weight: 600;
+  line-height: normal;
 }
 
 .benefit-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 26px;
+  width: 100%;
+  grid-template-columns: repeat(3, minmax(0, 191px));
+  justify-content: center;
+  gap: 20px;
 }
 
 .benefit {
   display: flex;
-  min-height: 210px;
+  box-sizing: border-box;
+  min-height: 205px;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 18px;
   border-radius: 8px;
   padding: 16px;
-  background: white;
-  box-shadow: 0 1px 5px rgb(0 0 0 / 25%);
+  background: #fff;
+  box-shadow: 0 1px 2.5px rgb(0 0 0 / 25%);
   text-align: center;
 }
 
-.benefit > div {
-  display: flex;
-  height: 95px;
-  align-items: center;
-  justify-content: center;
+.benefit-icon {
+  position: relative;
+  width: var(--size);
+  height: var(--size);
+  flex: none;
+}
+
+.benefit-icon img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
 }
 
 .benefit strong {
+  color: #2d2828;
   font-family: "Open Sans:SemiBold", sans-serif;
-  font-size: 19px;
-  line-height: 1.2;
+  font-size: 22px;
+  font-weight: 600;
+  line-height: normal;
 }
 
+@media (min-width: 1300px) {
+  .why-layout {
+    width: 1235px;
+    grid-template-columns: 521px 690px;
+    margin-inline: -35px 0;
+  }
+
+  .why-description {
+    font-size: 24px;
+  }
+
+  .benefit-grid {
+    gap: 39px;
+  }
+
+  .benefit strong {
+    font-size: 24px;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Choose your plan
+   ------------------------------------------------------------------ */
 .pricing-section {
-  padding-top: 105px;
+  padding-top: 56px;
+}
+
+.pricing-section .section-title {
+  margin-bottom: 43.8px;
 }
 
 .plan-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  align-items: stretch;
-  gap: 28px;
+  grid-template-columns: repeat(3, minmax(0, 384px));
+  align-items: end;
+  justify-content: center;
+  gap: 24px;
 }
 
 .plan {
+  --main-gap: 29.333px;
+  --head-gap: 10px;
+  --action-gap: 36px;
   display: flex;
-  min-height: 520px;
+  box-sizing: border-box;
+  height: 476px;
   flex-direction: column;
   align-items: center;
-  gap: 24px;
-  border: 1.5px solid #b1d929;
-  border-radius: 8px;
-  padding: 26px 25px;
+  gap: var(--action-gap);
+  overflow: clip;
+  border: 2px solid #80d72f;
+  border-radius: 10px;
+  padding: 30px 19.333px;
   background: #fff;
 }
 
 .plan-featured {
-  background: #efffbc;
-  box-shadow: 0 4px 12px rgb(0 0 0 / 17%);
+  --main-gap: 5.333px;
+  --head-gap: 13.333px;
+  --action-gap: 69px;
+  height: 509px;
+  background: linear-gradient(
+    0deg,
+    rgb(167 209 41 / 0%) 76.661%,
+    rgb(167 209 41 / 78%) 100%
+  );
+}
+
+.plan-annual {
+  --main-gap: 5.333px;
+  --action-gap: 50px;
+}
+
+.plan-main {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--main-gap);
 }
 
 .plan-head {
   display: flex;
-  min-height: 105px;
   flex-direction: column;
   align-items: center;
+  gap: var(--head-gap);
+  color: #0e0b0b;
+  font-family: "Poppins:SemiBold", sans-serif;
+  font-weight: 600;
+  line-height: normal;
   text-align: center;
 }
 
 .plan h3 {
-  margin: 0 0 10px;
-  font-family: "Open Sans:Bold", sans-serif;
-  font-size: 20px;
+  margin: 0;
+  font-size: 26.667px;
+  font-weight: 600;
+  line-height: normal;
 }
 
-.plan-head strong {
-  font-family: "Poppins:SemiBold", sans-serif;
-  font-size: 35px;
-  line-height: 1.2;
+.plan-note {
+  font-size: 32px;
 }
 
-.plan-head strong span {
-  margin-right: 4px;
-  font-family: sans-serif;
-  font-size: 26px;
+.plan-price {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-size: 46.222px;
+  white-space: nowrap;
 }
 
-.plan-head small {
-  color: #2d2828;
-  font-size: 13px;
+.plan-price img {
+  display: block;
+  width: 35px;
+  height: 40px;
+  flex: none;
 }
 
 .plan-body {
-  flex: 1;
-  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10.667px;
 }
 
 .plan-body h4 {
-  margin: 0 0 14px;
+  margin: 0;
+  color: #2d2828;
   font-family: "Open Sans:Bold", sans-serif;
-  font-size: 18px;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: normal;
   text-align: center;
 }
 
 .plan ul {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -865,16 +1109,38 @@ a {
   align-items: flex-start;
   gap: 8px;
   color: #1e1c1c;
-  font-size: 17px;
-  line-height: 1.35;
+  font-family: "Open Sans:Regular", sans-serif;
+  font-size: 21.333px;
+  line-height: normal;
 }
 
 .plan li img {
-  flex: 0 0 auto;
+  display: block;
+  width: 32px;
+  height: 32px;
+  flex: none;
+}
+
+.plan li span {
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.plan li span.wrap {
+  white-space: normal;
+}
+
+.plan .button {
+  width: 180.006px;
+  height: 53.156px;
+  border-width: 1.286px;
+  padding: 0;
+  font-size: 20.57px;
+  box-shadow: inset 0 -2.572px 1.029px rgb(0 0 0 / 25%);
 }
 
 .testimonials {
-  padding-top: 105px;
+  padding-top: 56px;
 }
 
 .review-grid {
@@ -1088,15 +1354,12 @@ footer {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-
-  .why-layout {
-    grid-template-columns: 430px 1fr;
-    gap: 25px;
+  .step h3 {
+    font-size: 21px;
   }
 
-  .why-visual {
-    transform: scale(0.86);
-    transform-origin: left center;
+  .step p {
+    font-size: 17px;
   }
 
   .why-description {
@@ -1110,6 +1373,46 @@ footer {
   .benefit {
     padding: 10px;
   }
+
+  .benefit strong {
+    font-size: 18px;
+  }
+
+  .plan-grid {
+    gap: 16px;
+  }
+
+  .plan {
+    height: auto;
+    min-height: 0;
+    padding-inline: 14px;
+  }
+
+  .plan h3 {
+    font-size: 22px;
+  }
+
+  .plan-note {
+    font-size: 26px;
+  }
+
+  .plan-price {
+    font-size: 36px;
+  }
+
+  .plan li {
+    font-size: 17px;
+  }
+
+  .plan li span {
+    white-space: normal;
+  }
+
+
+
+
+
+
 }
 
 @media (max-width: 820px) {
@@ -1192,6 +1495,25 @@ footer {
     padding-top: 56px;
   }
 
+  .why-layout {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+  }
+
+  .why-visual {
+    --s: var(--why-s1, 1);
+  }
+
+  .why-content {
+    text-align: center;
+  }
+
+  .plan {
+    width: 100%;
+    max-width: 420px;
+    margin-inline: auto;
+  }
+
   .brand img {
     width: 140px;
   }
@@ -1266,47 +1588,18 @@ footer {
     grid-template-columns: 1fr;
   }
 
-  .steps {
-    grid-template-columns: 1fr;
-    gap: 50px;
-  }
 
-  .step {
-    padding: 0 50px;
-  }
 
-  .step-path {
-    display: none;
-  }
 
-  .why-layout {
-    grid-template-columns: 1fr;
-  }
 
-  .why-visual {
-    width: 490px;
-    max-width: 100%;
-    margin: 0 auto -20px;
-    transform: scale(0.9);
-    transform-origin: center;
-  }
 
-  .why-content {
-    text-align: center;
-  }
 
-  .benefit-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
 
   .plan-grid,
   .review-grid {
     grid-template-columns: 1fr;
   }
 
-  .plan {
-    min-height: 0;
-  }
 
   .footer-grid {
     grid-template-columns: 1fr 1fr;
@@ -1339,35 +1632,14 @@ footer {
     padding-top: 75px;
   }
 
-  .step {
-    padding: 0 20px;
-  }
 
-  .step-art {
-    height: 170px;
-  }
 
-  .why-visual {
-    height: 330px;
-    transform: none;
-  }
 
-  .why-ring {
-    display: none;
-  }
 
-  .why-photo {
-    top: 10px;
-    left: 50%;
-    width: 310px;
-    height: 310px;
-    transform: translateX(-50%);
-  }
 
-  .why-play {
-    top: 18px;
-    right: 5%;
-  }
+
+
+
 
   .why-description {
     font-size: 17px;
@@ -1375,11 +1647,7 @@ footer {
   }
 
   .benefit-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .benefit {
-    min-height: 180px;
+    grid-template-columns: minmax(0, 260px);
   }
 
   .final-cta {
