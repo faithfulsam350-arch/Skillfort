@@ -1,0 +1,10 @@
+{
+  "description": "Transforms design files into precise, clean, and accurate web layouts, ensuring professional-quality visuals for designers and developers.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
