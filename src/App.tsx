@@ -53,7 +53,17 @@ const courses: Course[] = [
   },
 ];
 
-const steps = [
+/**
+ * Each icon sits in a square box. `inset` / `bleed` are Figma's own crop values
+ * for the artwork inside that box (percentages of the box).
+ */
+const steps: {
+  image: string;
+  title: string;
+  description: string;
+  inset?: string;
+  bleed?: string;
+}[] = [
   {
     image: "802e9.png",
     title: "Choose a Course",
@@ -61,27 +71,62 @@ const steps = [
   },
   {
     image: "65ca5.svg",
+    inset: "14.06% 3.13%",
+    bleed: "-1.66% -1.28%",
     title: "Learn at Your Pace",
     description:
       "Watch videos, attend live sessions, and complete lessons anywhere, anytime.",
   },
   {
     image: "4c021.svg",
+    inset: "12.5% 8.33%",
+    bleed: "-1.59% -1.44%",
     title: "Get Certified",
     description:
       "Take quizzes and earn verifiable certificates you can use to grow your career.",
   },
 ];
 
-const plans = [
+const benefits: {
+  image: string;
+  label: string;
+  size: number;
+  inset?: string;
+  bleed?: string;
+}[] = [
+  {
+    image: "a7811.svg",
+    label: "Certificate Of Completion",
+    size: 80,
+    inset: "12.5% 8.34%",
+    bleed: "-3.12% -2.8%",
+  },
+  {
+    image: "d76e2.svg",
+    label: "Verifiable Credentials",
+    size: 64,
+    inset: "0 2.65% 0.14% 3.57%",
+  },
+  { image: "ecd8e.svg", label: "Industry Relevant", size: 62 },
+];
+
+const plans: {
+  name: string;
+  price?: string;
+  note?: string;
+  /** [text, check-icon file, allow wrapping] */
+  features: [string, string, boolean?][];
+  action: string;
+  variant?: "featured" | "annual";
+}[] = [
   {
     name: "Per course",
-    price: "Varies by course",
+    note: "Varies by course",
     features: [
-      "One-time payment",
-      "No subscription required",
-      "Certification on completion",
-      "Lifetime access to that course",
+      ["One-time payment", "df480.svg"],
+      ["No subscription required", "f66ca.svg"],
+      ["Certification on completion", "f66ca.svg"],
+      ["Lifetime access to that course", "f66ca.svg"],
     ],
     action: "View Courses",
   },
@@ -89,23 +134,24 @@ const plans = [
     name: "Monthly Plan",
     price: "15,000",
     features: [
-      "Access to all courses",
-      "New courses added monthly",
-      "Certification for every course",
-      "Cancel anytime",
+      ["Access to all courses", "f66ca.svg"],
+      ["New courses added monthly", "f66ca.svg"],
+      ["Certification for every course", "f66ca.svg"],
+      ["Cancel anytime", "f66ca.svg"],
     ],
     action: "Get Started",
-    featured: true,
+    variant: "featured",
   },
   {
     name: "Annual Plan",
     price: "60,000",
     features: [
-      "Unlimited access to all courses",
-      "Includes all certifications",
-      "Save 33% compared to monthly plan",
+      ["Unlimited access to all courses", "d86bf.svg"],
+      ["Includes all certifications", "d86bf.svg"],
+      ["Save 33% compared to monthly plan", "f66ca.svg", true],
     ],
     action: "Get Started",
+    variant: "annual",
   },
 ];
 
@@ -146,25 +192,29 @@ function Button({
 }
 
 /**
- * The hero is drawn on Figma's 1440px canvas. --k scales that canvas down on
- * narrower screens (821px+); --sk scales just the artwork in the stacked
- * mobile layout.
+ * A few sections are drawn on fixed Figma canvases. This sets CSS variables on
+ * <html> so they can shrink with the viewport:
+ *  --k        hero canvas scale (1440px design, 821px and up)
+ *  --sk       hero artwork scale in the stacked mobile layout
+ *  --why-s    "Why Skillfort" photo scale beside the text
+ *  --why-s1   "Why Skillfort" photo scale when stacked
  */
-function useHeroScale<T extends HTMLElement>() {
-  const ref = useRef<T>(null);
+function useLayoutScale() {
   useLayoutEffect(() => {
-    const el = ref.current;
-    if (!el) return;
+    const root = document.documentElement;
     const update = () => {
-      const width = document.documentElement.clientWidth;
-      el.style.setProperty("--k", String(Math.min(1, width / 1440)));
-      el.style.setProperty("--sk", String(Math.min(1, (width - 40) / 687)));
+      const width = root.clientWidth;
+      const set = (name: string, value: number) =>
+        root.style.setProperty(name, String(Math.round(value * 1000) / 1000));
+      set("--k", Math.min(1, width / 1440));
+      set("--sk", Math.min(1, (width - 40) / 687));
+      set("--why-s", Math.max(0.5, Math.min(1, (width - 64 - 24 - 420) / 521)));
+      set("--why-s1", Math.min(1, (width - 32) / 521));
     };
     update();
     window.addEventListener("resize", update);
     return () => window.removeEventListener("resize", update);
   }, []);
-  return ref;
 }
 
 function SectionHeading({
@@ -192,7 +242,7 @@ function SectionHeading({
 export default function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [category, setCategory] = useState("Telecommunications");
-  const heroRef = useHeroScale<HTMLElement>();
+  useLayoutScale();
 
   return (
     <div className="site-shell">
@@ -223,7 +273,7 @@ export default function App() {
       </header>
 
       <main>
-        <section className="hero" id="top" ref={heroRef}>
+        <section className="hero" id="top">
           <div className="hero-canvas">
             <img className="hero-wave" src={asset("cd888.svg")} alt="" aria-hidden="true" />
             <div className="hero-copy">
@@ -341,7 +391,15 @@ export default function App() {
             {steps.map((step) => (
               <article className="step" key={step.title}>
                 <div className="step-art">
-                  <img src={asset(step.image)} alt="" />
+                  {step.inset ? (
+                    <span className="art-inner" style={{ inset: step.inset }}>
+                      <span className="art-bleed" style={{ inset: step.bleed }}>
+                        <img src={asset(step.image)} alt="" />
+                      </span>
+                    </span>
+                  ) : (
+                    <img src={asset(step.image)} alt="" />
+                  )}
                 </div>
                 <h3>{step.title}</h3>
                 <p>{step.description}</p>
@@ -355,17 +413,34 @@ export default function App() {
           <SectionHeading underline="6e5f0.svg">Why Skillfort</SectionHeading>
           <div className="why-layout">
             <div className="why-visual">
-              <img className="why-ring" src={asset("fbbc4.svg")} alt="" />
-              <img
-                className="why-photo"
-                src={asset("36f43.png")}
-                alt="Two Skillfort professionals in safety equipment"
-              />
-              <img
-                className="why-play"
-                src={asset("d28ec.svg")}
-                alt="Play introduction"
-              />
+              <div className="why-stage">
+                <div className="why-circle" aria-hidden="true">
+                  <img src={asset("36f43.png")} alt="" />
+                </div>
+                <div className="why-person">
+                  <img
+                    src={asset("36f43.png")}
+                    alt="Two Skillfort professionals in safety equipment"
+                  />
+                </div>
+                <img
+                  className="why-ring"
+                  src={asset("fbbc4.svg")}
+                  alt=""
+                  aria-hidden="true"
+                />
+                <div className="why-arc why-arc-flip" aria-hidden="true">
+                  <img src={asset("dcb0e.svg")} alt="" />
+                </div>
+                <div className="why-arc" aria-hidden="true">
+                  <img src={asset("6b3ec.svg")} alt="" />
+                </div>
+                <img
+                  className="why-play"
+                  src={asset("d28ec.svg")}
+                  alt="Play introduction"
+                />
+              </div>
             </div>
             <div className="why-content">
               <p className="why-description">
@@ -378,16 +453,29 @@ export default function App() {
                 what’s next.
               </p>
               <div className="benefit-grid">
-                {[
-                  ["a7811.svg", "Certificate Of Completion"],
-                  ["d76e2.svg", "Verifiable Credentials"],
-                  ["ecd8e.svg", "Industry Relevant"],
-                ].map(([image, label]) => (
-                  <div className="benefit" key={label}>
-                    <div>
-                      <img src={asset(image)} alt="" />
+                {benefits.map((item) => (
+                  <div className="benefit" key={item.label}>
+                    <div
+                      className="benefit-icon"
+                      style={{ "--size": `${item.size}px` } as CSSProperties}
+                    >
+                      {item.inset ? (
+                        <span
+                          className="art-inner"
+                          style={{ inset: item.inset }}
+                        >
+                          <span
+                            className="art-bleed"
+                            style={{ inset: item.bleed }}
+                          >
+                            <img src={asset(item.image)} alt="" />
+                          </span>
+                        </span>
+                      ) : (
+                        <img src={asset(item.image)} alt="" />
+                      )}
                     </div>
-                    <strong>{label}</strong>
+                    <strong>{item.label}</strong>
                   </div>
                 ))}
               </div>
@@ -402,27 +490,35 @@ export default function App() {
           <div className="plan-grid">
             {plans.map((plan) => (
               <article
-                className={plan.featured ? "plan plan-featured" : "plan"}
+                className={["plan", plan.variant && `plan-${plan.variant}`]
+                  .filter(Boolean)
+                  .join(" ")}
                 key={plan.name}
               >
-                <div className="plan-head">
-                  <h3>{plan.name}</h3>
-                  <strong>
-                    {plan.price !== "Varies by course" && <span>₦</span>}
-                    {plan.price}
-                  </strong>
-                  {plan.featured && <small>Billed monthly</small>}
-                </div>
-                <div className="plan-body">
-                  <h4>What&apos;s included</h4>
-                  <ul>
-                    {plan.features.map((feature) => (
-                      <li key={feature}>
-                        <img src={asset("df480.svg")} alt="" />
-                        <span>{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
+                <div className="plan-main">
+                  <div className="plan-head">
+                    <h3>{plan.name}</h3>
+                    {plan.note && <p className="plan-note">{plan.note}</p>}
+                    {plan.price && (
+                      <p className="plan-price">
+                        <img src={asset("4b73f.svg")} alt="Naira" />
+                        {plan.price}
+                      </p>
+                    )}
+                  </div>
+                  <div className="plan-body">
+                    <h4>What&apos;s included</h4>
+                    <ul>
+                      {plan.features.map(([feature, icon, wrap]) => (
+                        <li key={feature}>
+                          <img src={asset(icon)} alt="" />
+                          <span className={wrap ? "wrap" : undefined}>
+                            {feature}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 </div>
                 <Button>{plan.action}</Button>
               </article>
