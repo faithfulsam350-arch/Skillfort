@@ -131,13 +131,21 @@ function Button({
 function SectionHeading({
   children,
   accent = "right",
+  underline,
 }: {
   children: React.ReactNode;
   accent?: "right" | "center";
+  underline: string;
 }) {
   return (
     <h2 className={`section-title section-title-${accent}`}>
       <span>{children}</span>
+      <img
+        className="section-title-wave"
+        src={asset(underline)}
+        alt=""
+        aria-hidden="true"
+      />
     </h2>
   );
 }
@@ -209,7 +217,9 @@ export default function App() {
         </section>
 
         <section className="section courses-section" id="courses">
-          <SectionHeading>Find the Right Course for You</SectionHeading>
+          <SectionHeading accent="center" underline="c2da0.svg">
+            Find the Right Course for You
+          </SectionHeading>
           <div className="category-list" aria-label="Course categories">
             {[
               "Telecommunications",
@@ -257,18 +267,21 @@ export default function App() {
         </section>
 
         <section className="section steps-section">
-          <SectionHeading accent="center">How it Works</SectionHeading>
+          <SectionHeading underline="446ef.svg">How it Works</SectionHeading>
           <div className="steps">
-            {steps.map((step, index) => (
+            <img
+              className="step-path"
+              src={asset("a09ed.svg")}
+              alt=""
+              aria-hidden="true"
+            />
+            {steps.map((step) => (
               <article className="step" key={step.title}>
                 <div className="step-art">
                   <img src={asset(step.image)} alt="" />
                 </div>
                 <h3>{step.title}</h3>
                 <p>{step.description}</p>
-                {index < steps.length - 1 && (
-                  <span className="step-connector" aria-hidden="true" />
-                )}
               </article>
             ))}
           </div>
@@ -276,7 +289,7 @@ export default function App() {
         </section>
 
         <section className="section why-section" id="about">
-          <SectionHeading>Why Skillfort</SectionHeading>
+          <SectionHeading underline="6e5f0.svg">Why Skillfort</SectionHeading>
           <div className="why-layout">
             <div className="why-visual">
               <img className="why-ring" src={asset("fbbc4.svg")} alt="" />
@@ -320,7 +333,9 @@ export default function App() {
         </section>
 
         <section className="section pricing-section" id="pricing">
-          <SectionHeading accent="center">Choose Your Plan</SectionHeading>
+          <SectionHeading underline="90b43.svg">
+            Choose Your Plan
+          </SectionHeading>
           <div className="plan-grid">
             {plans.map((plan) => (
               <article
@@ -353,7 +368,7 @@ export default function App() {
         </section>
 
         <section className="section testimonials">
-          <SectionHeading accent="center">
+          <SectionHeading accent="center" underline="35dd1.svg">
             What Our Learners Are Saying
           </SectionHeading>
           <div className="review-grid">
