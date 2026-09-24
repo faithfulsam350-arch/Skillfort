@@ -1,10 +1,23 @@
-import { useState } from "react";
+import { useLayoutEffect, useRef, useState, type CSSProperties } from "react";
 
 const asset = (name: string) => `/assets/${name}`;
 
-const courses = [
+type Course = {
+  image: string;
+  title: string;
+  description: string;
+  duration: string;
+  price: string;
+  /** Figma frames cards 1 and 4 with a taller, offset image; 2 and 3 are plain cover fits. */
+  imageStyle?: CSSProperties;
+  /** Bottom gradient colour (cards 3 and 4 use a lighter shade in the design). */
+  shade?: string;
+};
+
+const courses: Course[] = [
   {
     image: "a5f19.png",
+    imageStyle: { height: "140.74%", top: "-9.26%" },
     title: "Fiber Optic Cable Installation",
     description:
       "Learn how to handle, splice, and install fiber optic cables safely and professionally.",
@@ -21,6 +34,7 @@ const courses = [
   },
   {
     image: "c01ec.png",
+    shade: "rgb(0 0 0 / 70%)",
     title: "Introduction to Network Cabling",
     description:
       "Understand the basics of structured cabling systems and network layout planning.",
@@ -29,6 +43,8 @@ const courses = [
   },
   {
     image: "e3edd.png",
+    imageStyle: { height: "140.74%", top: "-7.16%" },
+    shade: "rgb(0 0 0 / 70%)",
     title: "Wireless Communication",
     description:
       "Explore how wireless technologies (Wi-Fi, LTE) work in modern telecom environments.",
@@ -117,15 +133,38 @@ const reviews = [
 function Button({
   children,
   secondary = false,
+  small = false,
 }: {
   children: React.ReactNode;
   secondary?: boolean;
+  small?: boolean;
 }) {
-  return (
-    <button className={secondary ? "button button-secondary" : "button"}>
-      {children}
-    </button>
-  );
+  const className = ["button", secondary && "button-secondary", small && "button-sm"]
+    .filter(Boolean)
+    .join(" ");
+  return <button className={className}>{children}</button>;
+}
+
+/**
+ * The hero is drawn on Figma's 1440px canvas. --k scales that canvas down on
+ * narrower screens (821px+); --sk scales just the artwork in the stacked
+ * mobile layout.
+ */
+function useHeroScale<T extends HTMLElement>() {
+  const ref = useRef<T>(null);
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const update = () => {
+      const width = document.documentElement.clientWidth;
+      el.style.setProperty("--k", String(Math.min(1, width / 1440)));
+      el.style.setProperty("--sk", String(Math.min(1, (width - 40) / 687)));
+    };
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+  return ref;
 }
 
 function SectionHeading({
@@ -153,6 +192,7 @@ function SectionHeading({
 export default function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [category, setCategory] = useState("Telecommunications");
+  const heroRef = useHeroScale<HTMLElement>();
 
   return (
     <div className="site-shell">
@@ -183,35 +223,42 @@ export default function App() {
       </header>
 
       <main>
-        <section className="hero" id="top">
-          <img className="hero-wave" src={asset("cd888.svg")} alt="" />
-          <div className="hero-copy">
-            <h1>Take Courses That Teach What Really Matters</h1>
-            <p>
-              Build job-ready skills at your own pace. Learn online or on-site,
-              get certified, and start moving forward.
-            </p>
-            <Button>Get Started</Button>
-          </div>
-          <div className="hero-visual">
-            <img
-              className="hero-ring hero-ring-one"
-              src={asset("1479d.svg")}
-              alt=""
-            />
-            <img
-              className="hero-ring hero-ring-two"
-              src={asset("7dba3.svg")}
-              alt=""
-            />
-            <img
-              className="hero-person"
-              src={asset("fa1a2.png")}
-              alt="A Skillfort telecom professional wearing safety equipment"
-            />
-            <div className="course-count">
-              <strong>20+</strong>
-              <span>Active Courses</span>
+        <section className="hero" id="top" ref={heroRef}>
+          <div className="hero-canvas">
+            <img className="hero-wave" src={asset("cd888.svg")} alt="" aria-hidden="true" />
+            <div className="hero-copy">
+              <h1>
+                Take Courses That Teach What <span>Really Matters</span>
+              </h1>
+              <p>
+                Build job-ready skills at your own pace. Learn online or
+                on-site, get certified, and start moving forward.
+              </p>
+              <Button>Get Started</Button>
+            </div>
+            <div className="hero-stage-wrap">
+              <div className="hero-stage">
+                <img className="hero-glow" src={asset("5ba97.svg")} alt="" aria-hidden="true" />
+                <div className="hero-arc hero-arc-inner" aria-hidden="true">
+                  <img src={asset("1479d.svg")} alt="" />
+                </div>
+                <div className="hero-arc hero-arc-outer" aria-hidden="true">
+                  <img src={asset("7dba3.svg")} alt="" />
+                </div>
+                <div className="hero-circle" aria-hidden="true">
+                  <img src={asset("fa1a2.png")} alt="" />
+                </div>
+                <div className="hero-person">
+                  <img
+                    src={asset("fa1a2.png")}
+                    alt="A Skillfort telecom professional wearing safety equipment"
+                  />
+                </div>
+                <div className="course-count">
+                  <strong>20+</strong>
+                  <span>Active Courses</span>
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -235,17 +282,33 @@ export default function App() {
                 key={item}
               >
                 {item}
+                {item === "View all" && (
+                  <img src={asset("b04aa.svg")} alt="" aria-hidden="true" />
+                )}
               </button>
             ))}
           </div>
           <div className="course-grid">
             {courses.map((course) => (
               <article className="course-card" key={course.title}>
-                <div className="course-image">
-                  <img src={asset(course.image)} alt="" />
+                <div
+                  className="course-image"
+                  style={course.shade ? ({ "--shade": course.shade } as CSSProperties) : undefined}
+                >
+                  <img src={asset(course.image)} alt="" style={course.imageStyle} />
                   <div className="course-meta">
-                    <span>Certification</span>
-                    <span>{course.duration}</span>
+                    <span>
+                      Certification
+                      <span className="icon-cert">
+                        <img src={asset("3a8e9.svg")} alt="" aria-hidden="true" />
+                      </span>
+                    </span>
+                    <span>
+                      {course.duration}
+                      <span className="icon-time">
+                        <img src={asset("8fa69.svg")} alt="" aria-hidden="true" />
+                      </span>
+                    </span>
                   </div>
                 </div>
                 <div className="course-content">
@@ -254,9 +317,9 @@ export default function App() {
                     <p>{course.description}</p>
                   </div>
                   <div className="course-action">
-                    <Button>View Course</Button>
-                    <strong>
-                      <span>₦</span>
+                    <Button small>View Course</Button>
+                    <strong className="course-price">
+                      <img src={asset("27bd2.svg")} alt="Naira" />
                       {course.price}
                     </strong>
                   </div>
