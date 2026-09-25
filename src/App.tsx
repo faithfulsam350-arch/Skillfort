@@ -262,7 +262,7 @@ function useMotion() {
             observer?.unobserve(entry.target);
           });
         },
-        { threshold: 0.15, rootMargin: "0px 0px -8% 0px" },
+        { threshold: 0.05, rootMargin: "0px 0px -2% 0px" },
       );
       // Stagger siblings (e.g. the four course cards) by a beat each.
       const seen = new Map<Element, number>();
@@ -270,7 +270,7 @@ function useMotion() {
         const parent = el.parentElement as Element;
         const index = seen.get(parent) ?? 0;
         seen.set(parent, index + 1);
-        el.style.setProperty("--reveal-delay", `${Math.min(index, 3) * 90}ms`);
+        el.style.setProperty("--reveal-delay", `${Math.min(index, 3) * 55}ms`);
         el.classList.add("reveal");
         observer?.observe(el);
       });
