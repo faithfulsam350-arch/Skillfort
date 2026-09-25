@@ -1338,133 +1338,6 @@ footer {
   font-size: 14px;
 }
 
-/* ------------------------------------------------------------------
-   Motion
-   - [data-reveal] items (set in App.tsx) fade/rise in as they scroll into
-     view; .is-visible is added by an IntersectionObserver.
-   - Each heading's orange underline is drawn in left-to-right afterwards.
-   - Cards lift on hover, or on tap for touch screens (.is-lifted).
-   Hidden states only apply once JS adds .reveal-ready, so the page is
-   fully visible without JS or with reduced motion.
-   ------------------------------------------------------------------ */
-@keyframes reveal-up {
-  from {
-    opacity: 0;
-    transform: translateY(28px);
-  }
-
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-
-@keyframes reveal-fade {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes draw-underline {
-  from {
-    clip-path: inset(0 100% 0 0);
-  }
-
-  to {
-    clip-path: inset(0 0 0 0);
-  }
-}
-
-.reveal-ready [data-reveal]:not(.is-visible) {
-  opacity: 0;
-}
-
-.reveal-ready [data-reveal].is-visible {
-  animation: reveal-up 0.75s cubic-bezier(0.22, 0.8, 0.3, 1)
-    var(--reveal-delay, 0ms) backwards;
-}
-
-.reveal-ready [data-reveal="fade"].is-visible {
-  animation-name: reveal-fade;
-}
-
-.reveal-ready .section-title:not(.is-visible) .section-title-wave {
-  clip-path: inset(0 100% 0 0);
-}
-
-.reveal-ready .section-title.is-visible .section-title-wave {
-  animation: draw-underline 0.9s cubic-bezier(0.65, 0, 0.35, 1) 0.4s backwards;
-}
-
-.course-card,
-.benefit,
-.plan,
-.review {
-  -webkit-tap-highlight-color: transparent;
-  transition:
-    transform 0.35s cubic-bezier(0.22, 0.8, 0.3, 1),
-    box-shadow 0.35s ease;
-}
-
-.course-card {
-  --lift-shadow: 0 16px 28px rgb(0 0 0 / 22%);
-}
-
-.benefit {
-  --lift-shadow: 0 12px 24px rgb(0 0 0 / 18%);
-}
-
-.plan {
-  --lift-shadow: 0 16px 30px rgb(128 215 47 / 35%);
-}
-
-.review {
-  --lift-shadow: 0 12px 26px rgb(0 0 0 / 14%);
-  background: #fff;
-}
-
-@media (hover: hover) {
-  .course-card:hover,
-  .benefit:hover,
-  .plan:hover,
-  .review:hover {
-    box-shadow: var(--lift-shadow);
-    transform: translateY(-8px);
-  }
-}
-
-.course-card.is-lifted,
-.benefit.is-lifted,
-.plan.is-lifted,
-.review.is-lifted {
-  box-shadow: var(--lift-shadow);
-  transform: translateY(-8px);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .reveal-ready [data-reveal] {
-    opacity: 1 !important;
-    animation: none !important;
-  }
-
-  .reveal-ready .section-title .section-title-wave {
-    clip-path: none !important;
-    animation: none !important;
-  }
-
-  .course-card,
-  .benefit,
-  .plan,
-  .review {
-    transition: none;
-  }
-}
-
-
 @media (max-width: 1100px) {
   .header {
     padding-inline: 28px;
@@ -1865,10 +1738,10 @@ footer {
 /* --- Scroll reveal (classes are added by useMotion) --- */
 .reveal {
   opacity: 0;
-  transform: translateY(28px);
+  transform: translateY(22px);
   transition:
-    opacity 0.7s ease var(--reveal-delay, 0s),
-    transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) var(--reveal-delay, 0s),
+    opacity 0.45s ease var(--reveal-delay, 0s),
+    transform 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) var(--reveal-delay, 0s),
     translate 0.3s ease,
     box-shadow 0.3s ease;
 }
@@ -1876,6 +1749,17 @@ footer {
 .reveal.is-visible {
   opacity: 1;
   transform: none;
+}
+
+/* .category-list already uses "transform" to stay centered (translateX(-50%)),
+   so it needs its own version of the reveal that keeps that centering intact
+   at every stage instead of being overwritten by the rule above. */
+.category-list.reveal {
+  transform: translateX(-50%) translateY(22px);
+}
+
+.category-list.reveal.is-visible {
+  transform: translateX(-50%);
 }
 
 /* --- Heading underline draws itself left to right --- */
