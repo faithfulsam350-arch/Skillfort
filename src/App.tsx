@@ -217,6 +217,72 @@ function useLayoutScale() {
   }, []);
 }
 
+/** Things that fade/rise into view as they scroll on screen. */
+const REVEAL_SELECTOR = [
+  ".section-title",
+  ".category-list",
+  ".course-card",
+  ".step",
+  ".why-visual",
+  ".why-description",
+  ".benefit",
+  ".plan",
+  ".review",
+  ".final-cta",
+].join(",");
+
+/** Cards that lift on hover (desktop) or on tap (touch screens). */
+const LIFT_SELECTOR = ".course-card, .benefit, .plan, .review";
+
+/**
+ * Scroll reveals + tap-to-lift. Reveals are skipped entirely when the visitor
+ * has asked their device to reduce motion.
+ */
+function useMotion() {
+  useLayoutEffect(() => {
+    // Touch screens have no hover, so a tap lifts a card (tap again or tap
+    // elsewhere to set it back down).
+    const onTap = (event: MouseEvent) => {
+      if (!window.matchMedia("(hover: none)").matches) return;
+      const card = (event.target as Element).closest(LIFT_SELECTOR);
+      document.querySelectorAll(".is-lifted").forEach((el) => {
+        if (el !== card) el.classList.remove("is-lifted");
+      });
+      card?.classList.toggle("is-lifted");
+    };
+    document.addEventListener("click", onTap);
+
+    let observer: IntersectionObserver | undefined;
+    if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            entry.target.classList.add("is-visible");
+            observer?.unobserve(entry.target);
+          });
+        },
+        { threshold: 0.15, rootMargin: "0px 0px -8% 0px" },
+      );
+      // Stagger siblings (e.g. the four course cards) by a beat each.
+      const seen = new Map<Element, number>();
+      document.querySelectorAll<HTMLElement>(REVEAL_SELECTOR).forEach((el) => {
+        const parent = el.parentElement as Element;
+        const index = seen.get(parent) ?? 0;
+        seen.set(parent, index + 1);
+        el.style.setProperty("--reveal-delay", `${Math.min(index, 3) * 90}ms`);
+        el.classList.add("reveal");
+        observer?.observe(el);
+      });
+    }
+
+    return () => {
+      document.removeEventListener("click", onTap);
+      observer?.disconnect();
+    };
+  }, []);
+}
+
 function SectionHeading({
   children,
   accent = "right",
@@ -243,6 +309,7 @@ export default function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [category, setCategory] = useState("Telecommunications");
   useLayoutScale();
+  useMotion();
 
   return (
     <div className="site-shell">
