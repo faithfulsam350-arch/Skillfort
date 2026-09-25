@@ -1338,6 +1338,133 @@ footer {
   font-size: 14px;
 }
 
+/* ------------------------------------------------------------------
+   Motion
+   - [data-reveal] items (set in App.tsx) fade/rise in as they scroll into
+     view; .is-visible is added by an IntersectionObserver.
+   - Each heading's orange underline is drawn in left-to-right afterwards.
+   - Cards lift on hover, or on tap for touch screens (.is-lifted).
+   Hidden states only apply once JS adds .reveal-ready, so the page is
+   fully visible without JS or with reduced motion.
+   ------------------------------------------------------------------ */
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes reveal-fade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes draw-underline {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+.reveal-ready [data-reveal]:not(.is-visible) {
+  opacity: 0;
+}
+
+.reveal-ready [data-reveal].is-visible {
+  animation: reveal-up 0.75s cubic-bezier(0.22, 0.8, 0.3, 1)
+    var(--reveal-delay, 0ms) backwards;
+}
+
+.reveal-ready [data-reveal="fade"].is-visible {
+  animation-name: reveal-fade;
+}
+
+.reveal-ready .section-title:not(.is-visible) .section-title-wave {
+  clip-path: inset(0 100% 0 0);
+}
+
+.reveal-ready .section-title.is-visible .section-title-wave {
+  animation: draw-underline 0.9s cubic-bezier(0.65, 0, 0.35, 1) 0.4s backwards;
+}
+
+.course-card,
+.benefit,
+.plan,
+.review {
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    transform 0.35s cubic-bezier(0.22, 0.8, 0.3, 1),
+    box-shadow 0.35s ease;
+}
+
+.course-card {
+  --lift-shadow: 0 16px 28px rgb(0 0 0 / 22%);
+}
+
+.benefit {
+  --lift-shadow: 0 12px 24px rgb(0 0 0 / 18%);
+}
+
+.plan {
+  --lift-shadow: 0 16px 30px rgb(128 215 47 / 35%);
+}
+
+.review {
+  --lift-shadow: 0 12px 26px rgb(0 0 0 / 14%);
+  background: #fff;
+}
+
+@media (hover: hover) {
+  .course-card:hover,
+  .benefit:hover,
+  .plan:hover,
+  .review:hover {
+    box-shadow: var(--lift-shadow);
+    transform: translateY(-8px);
+  }
+}
+
+.course-card.is-lifted,
+.benefit.is-lifted,
+.plan.is-lifted,
+.review.is-lifted {
+  box-shadow: var(--lift-shadow);
+  transform: translateY(-8px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal-ready [data-reveal] {
+    opacity: 1 !important;
+    animation: none !important;
+  }
+
+  .reveal-ready .section-title .section-title-wave {
+    clip-path: none !important;
+    animation: none !important;
+  }
+
+  .course-card,
+  .benefit,
+  .plan,
+  .review {
+    transition: none;
+  }
+}
+
+
 @media (max-width: 1100px) {
   .header {
     padding-inline: 28px;
@@ -1669,5 +1796,151 @@ footer {
   .footer-grid {
     grid-template-columns: 1fr;
     gap: 38px;
+  }
+}
+
+/* ==================================================================
+   Motion
+   Kept deliberately light: a hero load-in, scroll reveals, a
+   hand-drawn underline that draws itself, and card lift.
+   ================================================================== */
+
+/* --- Hero load-in --- */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(26px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.hero-copy h1,
+.hero-copy > p,
+.hero-copy .button {
+  animation: rise 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
+}
+
+.hero-copy > p {
+  animation-delay: 0.12s;
+}
+
+.hero-copy .button {
+  animation-delay: 0.24s;
+}
+
+.hero-stage-wrap {
+  animation: rise 1s cubic-bezier(0.2, 0.7, 0.2, 1) 0.1s backwards;
+}
+
+.course-count {
+  animation: pop 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) 0.9s backwards;
+}
+
+.course-card,
+.benefit,
+.plan,
+.review {
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    translate 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+/* --- Scroll reveal (classes are added by useMotion) --- */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity 0.7s ease var(--reveal-delay, 0s),
+    transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) var(--reveal-delay, 0s),
+    translate 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* --- Heading underline draws itself left to right --- */
+.section-title.reveal .section-title-wave {
+  clip-path: inset(-20% 100% -20% 0);
+  transition: clip-path 0.9s cubic-bezier(0.65, 0, 0.35, 1) 0.45s;
+}
+
+.section-title.reveal.is-visible .section-title-wave {
+  clip-path: inset(-20% 0 -20% 0);
+}
+
+/* --- Card lift: hover on desktop, tap on touch screens --- */
+@media (hover: hover) {
+  .course-card:hover,
+  .benefit:hover,
+  .plan:hover,
+  .review:hover {
+    translate: 0 -8px;
+  }
+
+  .course-card:hover {
+    box-shadow: 0 16px 28px rgb(0 0 0 / 22%);
+  }
+
+  .benefit:hover {
+    box-shadow: 0 12px 22px rgb(0 0 0 / 20%);
+  }
+
+  .plan:hover {
+    box-shadow: 0 16px 30px rgb(128 215 47 / 32%);
+  }
+
+  .review:hover {
+    box-shadow: 0 14px 26px rgb(0 0 0 / 15%);
+  }
+}
+
+.is-lifted {
+  translate: 0 -8px;
+}
+
+.course-card.is-lifted {
+  box-shadow: 0 16px 28px rgb(0 0 0 / 22%);
+}
+
+.benefit.is-lifted {
+  box-shadow: 0 12px 22px rgb(0 0 0 / 20%);
+}
+
+.plan.is-lifted {
+  box-shadow: 0 16px 30px rgb(128 215 47 / 32%);
+}
+
+.review.is-lifted {
+  box-shadow: 0 14px 26px rgb(0 0 0 / 15%);
+}
+
+/* --- Respect "reduce motion" --- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
